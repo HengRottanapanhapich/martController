@@ -1,26 +1,35 @@
-import styles from "./Sidebar.module.css"
-
-function Sidebar() {
+import { NavLink } from "react-router-dom";
+import styles from "./Sidebar.module.css";
 
 const NAV_ITEMS = [
-    { label: 'Dashboard', active: true },
-    { label: 'Inventory' },
-    { label: 'Checkout' },
-    { label: 'Purchase orders' },
-    { label: 'Supplier' },
-    { label: 'Users' },
-    ];
+    { label: "Dashboard", path: "/" },
+    { label: "Inventory", path: "/inventory" },
+    { label: "Checkout", path: "/checkout" },
+    { label: "Purchase orders", path: "/purchase-orders" },
+    { label: "Supplier", path: "/supplier" },
+    { label: "Users", path: "/users" },
+];
 
-    return(
-        <aside className={styles.sidebar}>
-            <div className={styles.brand}>Mart controller</div>
-            <nav className={styles.nav}>
-                {NAV_ITEMS.map((item) => (
-                    <button key={item.label} type="button" className={`${styles.navItem} ${item.active ? styles.navItemActive : ''}`}>{item.label}</button>
-                ))}
-            </nav>
-        </aside>
-    );
+function Sidebar() {
+    return (
+    <aside className={styles.sidebar}>
+      <div className={styles.brand}>Mart controller</div>
+      <nav className={styles.nav}>
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            end={item.path === "/"}
+            className={({ isActive }) =>
+              `${styles.navItem} ${isActive ? styles.navItemActive : ""}`
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+    </aside>
+  );
 }
 
 export default Sidebar;

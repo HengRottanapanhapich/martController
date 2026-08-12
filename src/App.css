@@ -1,9 +1,11 @@
 #sidebarFlex {
   display: flex;
   min-height: 100vh;
-  width: 100vw;
 }
 
-#topbarFlex{
-  width: calc(100vw - 239px);
+#mainColumn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }

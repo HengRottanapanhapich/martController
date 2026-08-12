@@ -1,20 +1,28 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Sidebar from "./components/Sidebar/Sidebar";
+import Topbar from "./components/Topbar/Topbar";
 import Dashboard from "./pages/Dashboard";
-import Sidebar from "../src/components/Sidebar/Sidebar.jsx";
-import Topbar from "./components/Topbar/Topbar.jsx";
+import Inventory from "./pages/Inventory";
 import "./App.css";
 
 function App() {
   return (
-    <div>
-      
+    <BrowserRouter>
       <div id="sidebarFlex">
-        <Sidebar></Sidebar>
-        <div id="topbarFlex">
-          <Topbar></Topbar>
-          <Dashboard></Dashboard>
+        <Sidebar />
+        <div id="mainColumn">
+          <Topbar />
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/inventory" element={<Inventory />} />
+            {/* <Route path="/checkout" element={<Checkout title="Checkout" />} /> */}
+            {/* <Route path="/purchase-orders" element={<PurchaseOrders title="Purchase orders" />} /> */}
+            {/* <Route path="/supplier" element={<Supplier title="Supplier" />} /> */}
+            {/* <Route path="/users" element={<Users title="Users" />} /> */}
+          </Routes>
         </div>
       </div>
-    </div>
+    </BrowserRouter>
   );
 }
 
