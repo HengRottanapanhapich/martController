@@ -283,6 +283,9 @@ export default function PurchaseOrders() {
   }
 
   if (view === 'detail' && selectedOrder) {
+    const orderStatus = getOrderStatus(selectedOrder);
+    const isReceived = orderStatus === 'Received';
+
     return (
       <div className={styles.content}>
         <div className={styles.headerRow}>
@@ -294,9 +297,12 @@ export default function PurchaseOrders() {
 
         <div className={styles.formCard} style={{ padding: 0, overflow: 'hidden' }}>
           <div style={{ padding: '20px 24px 0' }}>
-            <h2 className={styles.formSectionTitle} style={{ marginBottom: 2 }}>
-              Receive shipment
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <h2 className={styles.formSectionTitle} style={{ marginBottom: 2 }}>
+                {isReceived ? 'Shipment details' : 'Receive shipment'}
+              </h2>
+              <span className={`${styles.badge} ${statusBadgeClass(orderStatus)}`}>{orderStatus}</span>
+            </div>
             <p className={styles.pageSubtitle} style={{ margin: '0 0 16px' }}>
               {selectedOrder.supplier} · ordered {selectedOrder.orderDate}
             </p>
@@ -322,32 +328,36 @@ export default function PurchaseOrders() {
                     <td>{item.product}</td>
                     <td className={styles.muted}>{item.ordered}</td>
                     <td>
-                      <div className={styles.counter}>
-                        <button
-                          type="button"
-                          className={styles.counterBtn}
-                          onClick={() => handleReceivedStep(idx, -1)}
-                          aria-label="Decrease received"
-                        >
-                          −
-                        </button>
-                        <input
-                          type="number"
-                          className={styles.counterInput}
-                          value={item.received}
-                          min={0}
-                          max={item.ordered}
-                          onChange={(e) => handleReceivedChange(idx, Number(e.target.value))}
-                        />
-                        <button
-                          type="button"
-                          className={styles.counterBtn}
-                          onClick={() => handleReceivedStep(idx, 1)}
-                          aria-label="Increase received"
-                        >
-                          +
-                        </button>
-                      </div>
+                      {isReceived ? (
+                        <span>{item.received}</span>
+                      ) : (
+                        <div className={styles.counter}>
+                          <button
+                            type="button"
+                            className={styles.counterBtn}
+                            onClick={() => handleReceivedStep(idx, -1)}
+                            aria-label="Decrease received"
+                          >
+                            −
+                          </button>
+                          <input
+                            type="number"
+                            className={styles.counterInput}
+                            value={item.received}
+                            min={0}
+                            max={item.ordered}
+                            onChange={(e) => handleReceivedChange(idx, Number(e.target.value))}
+                          />
+                          <button
+                            type="button"
+                            className={styles.counterBtn}
+                            onClick={() => handleReceivedStep(idx, 1)}
+                            aria-label="Increase received"
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
                     </td>
                     <td className={styles.muted}>${item.unitCost.toFixed(2)}</td>
                     <td>${(item.received * item.unitCost).toFixed(2)}</td>
@@ -363,12 +373,20 @@ export default function PurchaseOrders() {
           </div>
 
           <div className={styles.formActions} style={{ padding: '20px 24px' }}>
-            <button type="button" className={styles.cancelBtn} onClick={closeDetail}>
-              Cancel
-            </button>
-            <button type="button" className={styles.confirmBtn} onClick={confirmShipment}>
-              confirm
-            </button>
+            {isReceived ? (
+              <button type="button" className={styles.cancelBtn} onClick={closeDetail}>
+                Close
+              </button>
+            ) : (
+              <>
+                <button type="button" className={styles.cancelBtn} onClick={closeDetail}>
+                  Cancel
+                </button>
+                <button type="button" className={styles.confirmBtn} onClick={confirmShipment}>
+                  confirm
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
