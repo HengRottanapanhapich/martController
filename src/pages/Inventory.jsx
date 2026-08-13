@@ -3,15 +3,15 @@ import styles from "../pageStyle/Inventory.module.css";
 import React, { useState } from 'react';
 
 const INITIAL_PRODUCTS = [
-  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
-  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
-  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
-  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
-  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
-  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
-  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
-  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
-  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
+  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', supplier: 'Fizzypop', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
+  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', supplier: 'Fizzypop', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
+  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', supplier: 'Fizzypop', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
+  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', supplier: 'Fizzypop', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
+  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', supplier: 'Fizzypop', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
+  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', supplier: 'Fizzypop', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
+  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', supplier: 'Fizzypop', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
+  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', supplier: 'Fizzypop', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
+  { id: '#0210', name: 'Coke cola (can)', category: 'Soda', supplier: 'Fizzypop', price: '$0.50', stock: 90, reorderLevel: 100, status: 'Critical' },
 ];
 
 const INITIAL_CATEGORIES = [
@@ -23,9 +23,19 @@ const INITIAL_CATEGORIES = [
   { name: 'Chip', aisle: 'aisle6' },
 ];
 
+const INITIAL_SUPPLIERS = [
+  { name: 'Fizzypop' },
+  { name: 'DairyBest' },
+  { name: 'Golden Bake' },
+  { name: 'Leaf & Brew' },
+  { name: 'FrostyTreats' },
+  { name: 'CrunchCo' },
+];
+
 const emptyProductForm = () => ({
   name: '',
   category: '',
+  supplier: '',
   price: '',
   stock: '',
   reorderLevel: '',
@@ -37,6 +47,7 @@ export default function Inventory() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false);
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+  const [suppliers] = useState(INITIAL_SUPPLIERS);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryAisle, setNewCategoryAisle] = useState('');
   const [categoryFilter, setCategoryFilter] = useState(categories[0]?.name ?? '');
@@ -62,6 +73,7 @@ export default function Inventory() {
     setProductForm({
       name: product.name,
       category: product.category,
+      supplier: product.supplier,
       price: product.price,
       stock: product.stock,
       reorderLevel: product.reorderLevel,
@@ -189,6 +201,24 @@ export default function Inventory() {
             </div>
 
             <div className={styles.formField}>
+              <label className={styles.formLabel}>Supplier</label>
+              <select
+                className={styles.formSelect}
+                value={productForm.supplier}
+                onChange={handleProductFieldChange('supplier')}
+              >
+                <option value="" disabled>
+                  Supplier
+                </option>
+                {suppliers.map((s) => (
+                  <option key={s.name} value={s.name}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.formField}>
               <label className={styles.formLabel}>price</label>
               <input
                 type="text"
@@ -283,6 +313,7 @@ export default function Inventory() {
               <th>ID</th>
               <th>Product</th>
               <th>Category</th>
+              <th>Supplier</th>
               <th>Price</th>
               <th>Stock</th>
               <th>Reorder level</th>
@@ -296,6 +327,7 @@ export default function Inventory() {
                 <td className={styles.muted}>{product.id}</td>
                 <td>{product.name}</td>
                 <td>{product.category}</td>
+                <td>{product.supplier}</td>
                 <td>{product.price}</td>
                 <td>{product.stock}</td>
                 <td>{product.reorderLevel}</td>
