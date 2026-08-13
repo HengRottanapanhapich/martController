@@ -29,6 +29,7 @@ export default function Inventory() {
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false);
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryAisle, setNewCategoryAisle] = useState('');
   const [categoryFilter, setCategoryFilter] = useState(categories[0]?.name ?? '');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -53,8 +54,9 @@ export default function Inventory() {
   const handleAddCategory = () => {
     const trimmed = newCategoryName.trim();
     if (!trimmed) return;
-    setCategories((prev) => [...prev, { name: trimmed, aisle: '' }]);
+    setCategories((prev) => [...prev, { name: trimmed, aisle: newCategoryAisle.trim() }]);
     setNewCategoryName('');
+    setNewCategoryAisle('');
     setShowAddCategoryForm(false);
   };
 
@@ -66,6 +68,7 @@ export default function Inventory() {
     setShowCategoryModal(false);
     setShowAddCategoryForm(false);
     setNewCategoryName('');
+    setNewCategoryAisle('');
   };
 
   const filteredProducts = INITIAL_PRODUCTS.filter((p) => {
@@ -299,6 +302,13 @@ export default function Inventory() {
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
                   autoFocus
+                />
+                <input
+                  type="text"
+                  placeholder="Aisle"
+                  className={styles.formInput}
+                  value={newCategoryAisle}
+                  onChange={(e) => setNewCategoryAisle(e.target.value)}
                 />
                 <button type="button" className={styles.addBtn} onClick={handleAddCategory}>
                   Add

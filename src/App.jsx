@@ -3,6 +3,8 @@ import Sidebar from "./components/Sidebar/Sidebar";
 import Topbar from "./components/Topbar/Topbar";
 import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
+import PurchaseOrders from "./pages/PurchaseOrders";
+import Supplier from "./pages/Supplier";
 import "./App.css";
 
 function App() {
@@ -14,10 +16,10 @@ function App() {
           <Topbar />
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/inventory" element={<Inventory/>} />
             {/* <Route path="/checkout" element={<Checkout title="Checkout" />} /> */}
-            {/* <Route path="/purchase-orders" element={<PurchaseOrders title="Purchase orders" />} /> */}
-            {/* <Route path="/supplier" element={<Supplier title="Supplier" />} /> */}
+            <Route path="/purchase-orders" element={<PurchaseOrders title="Purchase orders" />} />
+            <Route path="/supplier" element={<Supplier/>} />
             {/* <Route path="/users" element={<Users title="Users" />} /> */}
           </Routes>
         </div>
