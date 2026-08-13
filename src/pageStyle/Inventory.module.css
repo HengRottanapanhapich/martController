@@ -294,6 +294,64 @@
   padding: 4px 6px;
 }
 
+.deleteIconBtn {
+  background: #fce4e4;
+  border: none;
+  border-radius: 999px;
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #d64545;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.deleteIconBtn:hover {
+  background: #f9d0d0;
+}
+
+.confirmCard {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px 32px;
+  width: 340px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.confirmQuestion {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1c1c1c;
+  margin: 0;
+  text-align: center;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 12px;
+}
+
+.deleteConfirmBtn {
+  background: #3a9e85;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 22px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.deleteConfirmBtn:hover {
+  background: #33917a;
+}
+
 /* Add product form */
 
 .formCard {
@@ -403,7 +461,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(20, 20, 20, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;

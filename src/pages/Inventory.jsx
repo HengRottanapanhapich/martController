@@ -23,8 +23,17 @@ const INITIAL_CATEGORIES = [
   { name: 'Chip', aisle: 'aisle6' },
 ];
 
+const emptyProductForm = () => ({
+  name: '',
+  category: '',
+  price: '',
+  stock: '',
+  reorderLevel: '',
+});
+
 export default function Inventory() {
-  const [view, setView] = useState('table'); // 'table' | 'add'
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [view, setView] = useState('table'); // 'table' | 'add' | 'edit'
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false);
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
@@ -33,22 +42,66 @@ export default function Inventory() {
   const [categoryFilter, setCategoryFilter] = useState(categories[0]?.name ?? '');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [newProduct, setNewProduct] = useState({
-    name: '',
-    category: '',
-    price: '',
-    stock: '',
-    reorderLevel: '',
-  });
+  const [productForm, setProductForm] = useState(emptyProductForm());
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [deleteTargetIndex, setDeleteTargetIndex] = useState(null);
+  const [categoryDeleteTarget, setCategoryDeleteTarget] = useState(null);
 
-  const handleNewProductChange = (field) => (e) => {
-    setNewProduct((prev) => ({ ...prev, [field]: e.target.value }));
+  const handleProductFieldChange = (field) => (e) => {
+    setProductForm((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleAddProduct = () => {
-    // Wire this up to your product state / API as needed.
+  const openAddProduct = () => {
+    setProductForm(emptyProductForm());
+    setEditingIndex(null);
+    setView('add');
+  };
+
+  const openEditProduct = (index) => {
+    const product = products[index];
+    setProductForm({
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+      reorderLevel: product.reorderLevel,
+    });
+    setEditingIndex(index);
+    setView('edit');
+  };
+
+  const handleSaveProduct = () => {
+    if (editingIndex !== null) {
+      // Editing an existing product — keep its id/status, update the rest.
+      setProducts((prev) =>
+        prev.map((p, i) => (i === editingIndex ? { ...p, ...productForm } : p))
+      );
+    } else {
+      // Wire this up to your product state / API as needed for a real id/status.
+      setProducts((prev) => [...prev, { id: '#new', status: 'Critical', ...productForm }]);
+    }
     setView('table');
-    setNewProduct({ name: '', category: '', price: '', stock: '', reorderLevel: '' });
+    setProductForm(emptyProductForm());
+    setEditingIndex(null);
+  };
+
+  const cancelProductForm = () => {
+    setView('table');
+    setProductForm(emptyProductForm());
+    setEditingIndex(null);
+  };
+
+  const requestDeleteProduct = (index) => {
+    setDeleteTargetIndex(index);
+  };
+
+  const cancelDeleteProduct = () => {
+    setDeleteTargetIndex(null);
+  };
+
+  const confirmDeleteProduct = () => {
+    setProducts((prev) => prev.filter((_, i) => i !== deleteTargetIndex));
+    setDeleteTargetIndex(null);
   };
 
   const handleAddCategory = () => {
@@ -60,8 +113,17 @@ export default function Inventory() {
     setShowAddCategoryForm(false);
   };
 
-  const handleDeleteCategory = (name) => {
-    setCategories((prev) => prev.filter((c) => c.name !== name));
+  const requestDeleteCategory = (name) => {
+    setCategoryDeleteTarget(name);
+  };
+
+  const cancelDeleteCategory = () => {
+    setCategoryDeleteTarget(null);
+  };
+
+  const confirmDeleteCategory = () => {
+    setCategories((prev) => prev.filter((c) => c.name !== categoryDeleteTarget));
+    setCategoryDeleteTarget(null);
   };
 
   const closeCategoryModal = () => {
@@ -71,25 +133,30 @@ export default function Inventory() {
     setNewCategoryAisle('');
   };
 
-  const filteredProducts = INITIAL_PRODUCTS.filter((p) => {
-    const matchesCategory = !categoryFilter || p.category === categoryFilter;
-    const matchesSearch =
-      !searchTerm ||
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.id.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredProducts = products
+    .map((product, index) => ({ product, index }))
+    .filter(({ product }) => {
+      const matchesCategory = !categoryFilter || product.category === categoryFilter;
+      const matchesSearch =
+        !searchTerm ||
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.id.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
 
-  if (view === 'add') {
+  if (view === 'add' || view === 'edit') {
+    const isEdit = view === 'edit';
     return (
       <div className={styles.content}>
         <div>
-          <h1 className={styles.pageTitleAccent}>Add a new product</h1>
+          <h1 className={styles.pageTitleAccent}>{isEdit ? 'Edit product' : 'Add a new product'}</h1>
           <p className={styles.pageSubtitle}>Fill out the required information for the product</p>
         </div>
 
         <div className={styles.formCard}>
-          <h2 className={styles.formSectionTitle}>Product information</h2>
+          <h2 className={styles.formSectionTitle}>
+            {isEdit ? 'Edit product information' : 'Product information'}
+          </h2>
 
           <div className={styles.formGrid}>
             <div className={styles.formField}>
@@ -98,8 +165,8 @@ export default function Inventory() {
                 type="text"
                 placeholder="Product name"
                 className={styles.formInput}
-                value={newProduct.name}
-                onChange={handleNewProductChange('name')}
+                value={productForm.name}
+                onChange={handleProductFieldChange('name')}
               />
             </div>
 
@@ -107,8 +174,8 @@ export default function Inventory() {
               <label className={styles.formLabel}>Category</label>
               <select
                 className={styles.formSelect}
-                value={newProduct.category}
-                onChange={handleNewProductChange('category')}
+                value={productForm.category}
+                onChange={handleProductFieldChange('category')}
               >
                 <option value="" disabled>
                   Product category
@@ -127,8 +194,8 @@ export default function Inventory() {
                 type="text"
                 placeholder="Product price"
                 className={styles.formInput}
-                value={newProduct.price}
-                onChange={handleNewProductChange('price')}
+                value={productForm.price}
+                onChange={handleProductFieldChange('price')}
               />
             </div>
 
@@ -138,8 +205,8 @@ export default function Inventory() {
                 type="text"
                 placeholder="Product stock"
                 className={styles.formInput}
-                value={newProduct.stock}
-                onChange={handleNewProductChange('stock')}
+                value={productForm.stock}
+                onChange={handleProductFieldChange('stock')}
               />
             </div>
 
@@ -149,25 +216,25 @@ export default function Inventory() {
                 type="text"
                 placeholder="Reorder level for product"
                 className={styles.formInput}
-                value={newProduct.reorderLevel}
-                onChange={handleNewProductChange('reorderLevel')}
+                value={productForm.reorderLevel}
+                onChange={handleProductFieldChange('reorderLevel')}
               />
             </div>
           </div>
 
           <div className={styles.imageSection}>
-            <h2 className={styles.formSectionTitle}>Add product image</h2>
-            <button type="button" className={styles.imageUpload} aria-label="Add product image">
+            <h2 className={styles.formSectionTitle}>{isEdit ? 'Edit product image' : 'Add product image'}</h2>
+            <button type="button" className={styles.imageUpload} aria-label="Product image">
               +
             </button>
           </div>
 
           <div className={styles.formActions}>
-            <button type="button" className={styles.cancelBtn} onClick={() => setView('table')}>
+            <button type="button" className={styles.cancelBtn} onClick={cancelProductForm}>
               Cancel
             </button>
-            <button type="button" className={styles.addProductBtn} onClick={handleAddProduct}>
-              Add product
+            <button type="button" className={styles.addProductBtn} onClick={handleSaveProduct}>
+              {isEdit ? 'confirm' : 'Add product'}
             </button>
           </div>
         </div>
@@ -179,7 +246,7 @@ export default function Inventory() {
     <div className={styles.content}>
       <div className={styles.headerRow}>
         <h1 className={styles.pageTitle}>Inventory</h1>
-        <button type="button" className={styles.outlineBtn} onClick={() => setView('add')}>
+        <button type="button" className={styles.outlineBtn} onClick={openAddProduct}>
           Add product
         </button>
       </div>
@@ -224,8 +291,8 @@ export default function Inventory() {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.map((product, idx) => (
-              <tr key={idx}>
+            {filteredProducts.map(({ product, index }) => (
+              <tr key={index}>
                 <td className={styles.muted}>{product.id}</td>
                 <td>{product.name}</td>
                 <td>{product.category}</td>
@@ -239,11 +306,16 @@ export default function Inventory() {
                 </td>
                 <td>
                   <div className={styles.activityCell}>
-                    <button type="button" className={styles.editBtn}>
+                    <button type="button" className={styles.editBtn} onClick={() => openEditProduct(index)}>
                       Edit
                     </button>
-                    <button type="button" className={styles.moreBtn} aria-label="More actions">
-                      ⋮
+                    <button
+                      type="button"
+                      className={styles.deleteIconBtn}
+                      onClick={() => requestDeleteProduct(index)}
+                      aria-label={`Delete ${product.name}`}
+                    >
+                      ✕
                     </button>
                   </div>
                 </td>
@@ -276,7 +348,7 @@ export default function Inventory() {
                   <button
                     type="button"
                     className={styles.categoryDelete}
-                    onClick={() => handleDeleteCategory(c.name)}
+                    onClick={() => requestDeleteCategory(c.name)}
                     aria-label={`Delete ${c.name}`}
                   >
                     ✕
@@ -315,6 +387,38 @@ export default function Inventory() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {deleteTargetIndex !== null && (
+        <div className={styles.modalOverlay} onClick={cancelDeleteProduct}>
+          <div className={styles.confirmCard} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.confirmQuestion}>Do you want to delete this?</p>
+            <div className={styles.confirmActions}>
+              <button type="button" className={styles.cancelBtn} onClick={cancelDeleteProduct}>
+                Cancel
+              </button>
+              <button type="button" className={styles.deleteConfirmBtn} onClick={confirmDeleteProduct}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {categoryDeleteTarget !== null && (
+        <div className={styles.modalOverlay} onClick={cancelDeleteCategory}>
+          <div className={styles.confirmCard} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.confirmQuestion}>Do you want to delete this?</p>
+            <div className={styles.confirmActions}>
+              <button type="button" className={styles.cancelBtn} onClick={cancelDeleteCategory}>
+                Cancel
+              </button>
+              <button type="button" className={styles.deleteConfirmBtn} onClick={confirmDeleteCategory}>
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}
